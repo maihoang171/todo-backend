@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import type { CreateTaskInput } from "../schemas/task-schema.js";
 
-const createTaskService = async (data: CreateTaskInput) => {
+export const createTaskService = async (data: CreateTaskInput) => {
   const task = await prisma.task.create({
     data: {
       title: data.title,
@@ -18,4 +18,16 @@ const createTaskService = async (data: CreateTaskInput) => {
   return task;
 };
 
-export default createTaskService;
+export const getTasksService = async () => {
+  return await prisma.task.findMany({
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      status: true,
+      deadlineAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
