@@ -8,9 +8,9 @@ import { errorHandler } from "./middleware/error.js";
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-
 app.use(morgan("dev"));
+
+app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
@@ -19,7 +19,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1", router);
+
 app.use(errorHandler);
+
 app.listen(port, () => {
   console.log(`The server is running at http://localhost:${port}`);
 });
