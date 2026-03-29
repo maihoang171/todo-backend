@@ -1,9 +1,16 @@
 import type { NextFunction, Request, Response } from "express";
 import {
   createTaskService,
+  deleteTaskService,
   getTasksService,
+  updateTaskService,
 } from "../services/task-service.js";
-import { createTaskSchema } from "../schemas/task-schema.js";
+import {
+  createTaskSchema,
+  idSchema,
+  updateTaskSchema,
+} from "../schemas/task-schema.js";
+import { sendSuccess } from "../utils/response.js";
 
 export const createTaskController = async (
   req: Request,
@@ -13,11 +20,7 @@ export const createTaskController = async (
   try {
     const validatedData = createTaskSchema.parse(req.body);
     const newTask = await createTaskService(validatedData);
-
-    res.status(200).json({
-      message: "success",
-      data: newTask,
-    });
+    sendSuccess(res, 200, newTask);
   } catch (error) {
     next(error);
   }
@@ -31,10 +34,38 @@ export const getTasksController = async (
   try {
     const tasks = await getTasksService();
 
-    res.status(200).json({
-      message: "success",
-      data: tasks,
-    });
+    sendSuccess(res, 200, tasks);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateTaskController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+    const validatedData = updateTaskSchema.parse(req.body);
+    const updateTask = await updateTaskService(id, validatedData);
+
+    sendSuccess(res, 200, updateTask);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteTaskController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+
+    const deletedTask = await deleteTaskService(id);
+    sendSuccess(res, 200, deletedTask);
   } catch (error) {
     next(error);
   }

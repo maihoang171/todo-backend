@@ -18,8 +18,8 @@ describe("errorHandler", () => {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
     } as any;
-
-    errorHandler(mockZodError, req, res);
+    const next = vi.fn();
+    errorHandler(mockZodError, req, res, next);
     expect(res.status).toHaveBeenCalledWith(400);
   });
 
@@ -28,11 +28,12 @@ describe("errorHandler", () => {
 
     const req = {} as any;
     const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as any;
+    const next = vi.fn();
 
-    errorHandler(err, req, res);
+    errorHandler(err, req, res, next);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
-      status: "error",
+      success: false,
       message: "Internal server error",
     });
   });
