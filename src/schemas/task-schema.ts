@@ -9,11 +9,12 @@ export const createTaskSchema = z.object({
   description: z.string().optional(),
   deadlineAt: z
     .string()
-    .date()
     .refine(
       (dateStr) => {
-        const date = new Date(dateStr);
-        return date >= new Date();
+        const inputDate = new Date(dateStr)
+        const today = new Date()
+        today.setHours(0,0,0)
+        return inputDate >= today;
       },
       {
         message: "Deadline must be in the future",
@@ -21,6 +22,7 @@ export const createTaskSchema = z.object({
     )
     .transform((val) => new Date(val)),
 });
+
 
 export const updateTaskSchema = createTaskSchema
   .extend({

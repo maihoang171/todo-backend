@@ -1,3 +1,4 @@
+import type { Prisma } from "../../generated/prisma/client.js";
 import prisma from "../lib/prisma.js";
 import type {
   createTaskInput,
@@ -14,6 +15,7 @@ export const createTaskService = async (data: createTaskInput) => {
     select: {
       title: true,
       description: true,
+      status: true,
       deadlineAt: true,
       createdAt: true,
     },
@@ -21,21 +23,22 @@ export const createTaskService = async (data: createTaskInput) => {
   return task;
 };
 
-export const getTasksService = async () => {
-  return await prisma.task.findMany({
-    where: {
-      deletedAt: null,
-    },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      status: true,
-      deadlineAt: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+export const getTasksService = async (page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+  
+  const [tasks, totalCount] = await Promise.all([
+    prisma.task.findMany({
+      where: { deletedAt: null },
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    }),
+
+    prisma.task.count({
+      where: { deletedAt: null },
+    }),
+  ]);
+  return { tasks, totalCount, totalPages: Math.ceil(totalCount / limit) };
 };
 
 export const updateTaskService = async (
@@ -65,9 +68,9 @@ export const deleteTaskService = (id: string) => {
   return prisma.task.update({
     where: { id },
     data: { deletedAt: new Date() },
-    select:{
+    select: {
       id: true,
       title: true,
-    }
+    },
   });
 };

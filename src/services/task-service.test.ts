@@ -6,10 +6,11 @@ import {
   updateTaskService,
 } from "./task-service.js";
 import prisma from "../lib/prisma.js";
-import { mock } from "node:test";
+
 vi.mock("../lib/prisma.ts", () => ({
   default: {
     task: {
+      count: vi.fn(),
       create: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
@@ -27,28 +28,42 @@ it("should send the correct data to Prisma and return the new task", async () =>
 });
 
 it("should return the task list", async () => {
-  const mockTasks = [
+  const mockPage = 1;
+  const mockPageLimit = 10;
+
+  const mockTasksArray = [
     {
       id: "ba5715d5-4b10-4fc3-9406-e23e4a53a38b",
       title: "test1",
-      status: "PENDING",
+      description: "",
       deadlineAt: new Date(),
+      status: "PENDING",
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
     },
     {
       id: "2fabd321-9b7f-4070-8c8c-0ea7c541ae58",
       title: "test2",
+      description: "",
       status: "PENDING",
       deadlineAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
     },
   ];
-  vi.mocked(prisma.task.findMany).mockResolvedValue(mockTasks as any);
 
-  const result = await getTasksService();
-  expect(result).toEqual(mockTasks);
+  const mockTotalCount = 2;
+  vi.mocked(prisma.task.count).mockResolvedValue(mockTotalCount as any);
+  vi.mocked(prisma.task.findMany).mockResolvedValue(mockTasksArray as any);
+
+  const result = await getTasksService(mockPage, mockPageLimit);
+  expect(result).toEqual({
+    tasks: mockTasksArray,
+    totalCount: mockTotalCount,
+    totalPages: 1,
+  });
 });
 
 describe("updateTaskService", () => {
@@ -99,6 +114,7 @@ it("should update the deletedAt and return the deleted task", async () => {
     id: mockId,
     title: "delete test",
   };
+
   vi.mocked(prisma.task.update).mockResolvedValue(mockTaskResponse as any);
 
   const result = await deleteTaskService(mockId);

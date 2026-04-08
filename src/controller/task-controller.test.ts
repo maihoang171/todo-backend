@@ -21,7 +21,7 @@ vi.mock("../services/task-service", () => ({
   createTaskService: vi.fn(),
   getTasksService: vi.fn(),
   updateTaskService: vi.fn(),
-  deleteTaskService: vi.fn()
+  deleteTaskService: vi.fn(),
 }));
 
 const app = express();
@@ -175,7 +175,7 @@ describe("deleteTaskController", () => {
       title: "delete test",
     };
 
-    vi.mocked(deleteTaskService).mockResolvedValue(mockResponse as any)
+    vi.mocked(deleteTaskService).mockResolvedValue(mockResponse as any);
     const res = await request(app).delete(`/task/${mockId}`);
 
     expect(res.statusCode).toBe(200);
@@ -183,23 +183,23 @@ describe("deleteTaskController", () => {
   });
 
   it("should return 400 with zod error", async () => {
-    const fakeError = new Error("Zod error")
-    const badId = "12"
+    const fakeError = new Error("Zod error");
+    const badId = "12";
 
-    vi.mocked(deleteTaskService).mockRejectedValue(fakeError)
+    vi.mocked(deleteTaskService).mockRejectedValue(fakeError);
 
-    const result = await request(app).delete(`/task/${badId}`)
-    expect(result.statusCode).toBe(400)
-  })
+    const result = await request(app).delete(`/task/${badId}`);
+    expect(result.statusCode).toBe(400);
+  });
 
-  it("should return 500 with an unknown error occurs", async() => {
-    const fakeError = new Error()
+  it("should return 500 with an unknown error occurs", async () => {
+    const fakeError = new Error();
     const mockId = "a844cbaf-9d69-45f1-a5df-30378260a064";
 
-    vi.mocked(deleteTaskService).mockRejectedValue(fakeError)
+    vi.mocked(deleteTaskService).mockRejectedValue(fakeError);
 
-     const result = await request(app).delete(`/task/${mockId}`)
-    expect(result.statusCode).toBe(500)
-    expect(result.body.message).toBe("Internal server error")
-  })
+    const result = await request(app).delete(`/task/${mockId}`);
+    expect(result.statusCode).toBe(500);
+    expect(result.body.message).toBe("Internal server error");
+  });
 });

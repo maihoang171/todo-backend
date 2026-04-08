@@ -18,6 +18,7 @@ export const createTaskController = async (
   next: NextFunction,
 ) => {
   try {
+    console.log(req.body);
     const validatedData = createTaskSchema.parse(req.body);
     const newTask = await createTaskService(validatedData);
     sendSuccess(res, 200, newTask);
@@ -32,8 +33,10 @@ export const getTasksController = async (
   next: NextFunction,
 ) => {
   try {
-    const tasks = await getTasksService();
+    let page = parseInt(req.query.page as string, 10) || 1;
+    let limit = parseInt(req.query.limit as string, 10) || 10;
 
+    const tasks = await getTasksService(page, limit);
     sendSuccess(res, 200, tasks);
   } catch (error) {
     next(error);
