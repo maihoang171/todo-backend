@@ -4,17 +4,19 @@ import "dotenv/config";
 import router from "./routes/routes.js";
 import morgan from "morgan";
 import { errorHandler } from "./middleware/error.js";
-import cors from "cors"
+import cors from "cors";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(morgan("dev"));
 
-app.use(cors({
-  origin: 'http://localhost:5173', // React URL
-  credentials: true                // Allowed for Cookies/Axios
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://maihoang171.github.io"], // React URL
+    credentials: true, // Allowed for Cookies/Axios
+  }),
+);
 
 app.use(express.json());
 
